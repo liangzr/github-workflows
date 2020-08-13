@@ -1,0 +1,15 @@
+name: Trigger - Tag
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Dependencies
+        run: |
+          echo "hello world" > ~/greeting.txt
+          date > ~/time.txt
