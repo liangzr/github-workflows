@@ -27,7 +27,7 @@ function get_version() {
 
   ref_tag=$(echo ${GITHUB_REF} | cut -d'/' -f3)
 
-  if [[ ${ref_tag} == v* ]]; then
+  if [[ "${ref_tag}" == v* ]]; then
     version="${ref_tag:1}"
   else
     version="latest"
@@ -62,9 +62,9 @@ function test_image() {
 
   echo "Testing ${full_tag}..."
   output=$(docker run --rm ${NAME}:${full_tag} pipcook -v | sed -n "1,1p" | awk '{print $3}' | cut -b 2-)
-  [ $status -eq 0 ]
+  [[ $status -eq 0 ]]
   check
-  [[ $output == "$full_tag" ]]
+  [[ "$output" == "$full_tag" ]]
   check
 
   echo "Testing succeeded."
