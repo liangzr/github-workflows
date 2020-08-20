@@ -2,11 +2,11 @@ name: Docker
 on:
   push:
     tags:
-      - 'docker-*'
+      - 'v*'
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - run: docker -v
-      - run: export
+      - run: ./docker/build.sh
