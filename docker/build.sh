@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-org_name="pipcook"
-repo_name="pipcook"
+org_name="liangzr"
+repo_name="test_github_workflow"
 
 info() {
   printf "[Pipcook] %s\\n" "$@"
