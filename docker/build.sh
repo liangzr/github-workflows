@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
 
-docker_path="docker"
 org_name="pipcook"
 repo_name="pipcook"
 
+info() {
+  printf "[Pipcook] %s\\n" "$@"
+}
+
 fatal() {
-  printf "**********\\n"
-  printf "Fatal Error: %s\\n" "$@"
-  printf "**********\\n"
+  printf "[Pipcook] Fatal Error: %s\\n" "$@"
   exit 1
 }
 
 check() {
   if [ $? -ne 0 ]; then
-    fatal "Check image failed"
+    fatal "Verification failed."
   fi
 }
 
@@ -25,7 +26,8 @@ function get_version() {
   local ref_tag
   local version
 
-  ref_tag=$(echo ${GITHUB_REF} | cut -d'/' -f3)
+  # makes v1.1.0 becomes 1.10
+  ref_tag=${GITHUB_REF:10}
 
   if [[ "${ref_tag}" == v* ]]; then
     version="${ref_tag:1}"
@@ -37,59 +39,42 @@ function get_version() {
 }
 
 function build() {
-  local version
-  local full_tag
+  local tag
 
-  version="$1"
-  full_tag=$version
+  tag="$1"
 
-  echo "Building ${version}..."
+  info "Building ${tag}..."
 
-  if ! docker build -t "${NAME}:${full_tag}" --build-arg "VER=${version}" "${docker_path}"; then
-    fatal "Build of ${full_tag} failed!"
+  if ! docker build -t "${IMAGE_NAME}:${tag}" --build-arg "VER=${tag}" "docker"; then
+    fatal "Build of ${tag} failed!"
   fi
 
-  echo "Build of ${full_tag} succeeded."
+  info "Build of ${tag} succeeded."
 }
 
 function test_image() {
-  local version
-  local full_tag
+  local tag
   local output
 
-  version="$1"
-  full_tag="$version"
+  tag="$1"
 
-  echo "Testing ${full_tag}..."
-  output=$(docker run --rm ${NAME}:${full_tag} pipcook -v | sed -n "1,1p" | awk '{print $3}' | cut -b 2-)
+  info "Testing ${tag}..."
+  cli_version=$(docker run --rm ${IMAGE_NAME}:${tag} pipcook -v | sed -n "1,1p" | awk '{print $3}')
   [[ $status -eq 0 ]]
   check
-  [[ "$output" == "$full_tag" ]]
+  [[ "${cli_version:1}" == "$tag" ]]
   check
 
-  echo "Testing succeeded."
+  info "Testing succeeded."
 }
 
-function publish() {
-  local full_tag
-
-  full_tag=$1
-
-  if ! docker push -t "${NAME}:${full_tag}" -t "${NAME}:latest"; then
-    fatal "Publish of ${full_tag} failed!"
-  fi
-
-  echo "Publish of ${full_tag} succeeded."
-}
-
-NAME="${org_name}/${repo_name}"
+IMAGE_NAME="${org_name}/${repo_name}"
 
 version=$(get_version)
 
-if [[ -s "${docker_path}/Dockerfile" ]]; then
+if [[ -s "docker/Dockerfile" ]]; then
   build "${version}"
   test_image "${version}"
-  # publish "${version}"
 else
   fatal "Dockerfile not exists."
 fi
