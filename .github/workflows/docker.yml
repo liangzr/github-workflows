@@ -8,5 +8,5 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Check docker
-        run: docker -v
+      - run: docker -v
+      - run: exports
