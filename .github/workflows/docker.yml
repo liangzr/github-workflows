@@ -9,4 +9,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: docker -v
-      - run: exports
+      - run: export
