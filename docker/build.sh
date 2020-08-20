@@ -74,7 +74,7 @@ version=$(get_version)
 
 if [[ -s "docker/Dockerfile" ]]; then
   build "${version}"
-  test_image "${version}"
+  # test_image "${version}"
 else
   fatal "Dockerfile not exists."
 fi
