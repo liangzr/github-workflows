@@ -25,3 +25,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: liangzr/test_github_workflow
           tags: "latest,${{ env.RELEASE_VERSION }}"
+          tag_with_ref: true
