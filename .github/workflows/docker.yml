@@ -39,5 +39,7 @@ jobs:
             echo ::set-env name=DOCKER_PUBLISHED::true
           fi
 
+      - name: Output
+        run: |
           echo "${{ env.NPM_PUBLISHED }}"
           echo "${{ env.DOCKER_PUBLISHED }}"
