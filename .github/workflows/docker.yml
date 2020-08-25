@@ -1,15 +1,15 @@
-name: Deploy Docker image
+name: Publish Packages
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
 
 jobs:
   release:
-    name: Check
+    name: Release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Repo
         uses: actions/checkout@v2
 
       - name: Get release version
@@ -28,9 +28,8 @@ jobs:
           }
 
           if
-            [ $(check_pkg pipcook-cli $ver) == $ver ] ||
-              [ $(check_pkg daemon $ver) == $ver ] ||
-              [ $(check_pkg pipboard $ver) == $ver ]
+            [ $(check_pkg pipcook-cli $ver) == $ver ] &&
+            [ $(check_pkg daemon $ver) == $ver ]
           then
             echo ::set-env name=NPM_PUBLISHED::true
           fi
@@ -39,7 +38,13 @@ jobs:
             echo ::set-env name=DOCKER_PUBLISHED::true
           fi
 
-      - name: Output
-        run: |
-          echo "${{ env.NPM_PUBLISHED }}"
-          echo "${{ env.DOCKER_PUBLISHED }}"
+      - name: Publish to Docker registry
+        uses: docker/build-push-action@v1
+        if: env.DOCKER_PUBLISHED != 'true'
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: liangzr/test_github_workflow
+          dockerfile: docker/Dockerfile
+          build_args: VER=${{ env.RELEASE_VERSION }}
+          tags: "latest,${{ env.RELEASE_VERSION }}"

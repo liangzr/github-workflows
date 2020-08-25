@@ -7,11 +7,7 @@ check_image() {
   curl -sL "https://hub.docker.com/v2/repositories/pipcook/pipcook/tags/$1" | jq -r '.name'
 }
 
-if
-  [ $(check_pkg pipcook-cli $ver) == $ver ] ||
-    [ $(check_pkg daemon $ver) == $ver ] ||
-    [ $(check_pkg pipboard $ver) == $ver ]
-then
+if [ $(check_pkg pipboard $ver) == $ver ]; then
   echo ::set-env name=NPM_PUBLISHED::true
 fi
 
